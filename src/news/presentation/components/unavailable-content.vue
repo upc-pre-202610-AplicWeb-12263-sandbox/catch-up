@@ -1,46 +1,32 @@
-import {Source} from "../domain/model/source.entity.js";
-import {LogoDevApi} from "../../shared/infrastructure/logo-dev-api.js";
+<script setup lang="js">
+import {useI18n} from "vue-i18n";
+import {toRefs} from "vue";
 
 /**
-* @typedef {Object} SourceApiResource
-* @property {string} [id]
-* @property {string} [name]
-* @property {string} [description]
-* @property {string} [url]
-* @property {string} [category]
-* @property {string} [language]
-* @property {string} [country]
-*/
-
-
-const logoApi = new LogoDevApi();
+ * Presentation fallback component for infrastructure/application errors.
+ */
 
 /**
-* Maps source resources from the provider format into domain entities.
-*/
-export class SourceAssembler {
-/**
-* @param {import('axios').AxiosResponse<{status: string, sources: SourceApiResource[]}>} response
-* @returns {Source[]}
-*/
-static toEntitiesFromResponse(response) {
-if (response.data.status !== "ok") {
-console.error(`${response.status},  ${response.code}, ${response.message}`);
-return [];
-}
-const sourcesResponse = response.data;
-return sourcesResponse.sources.map((source) => {
-return this.toEntityFromResource(source);
-});
-}
+ * @typedef {Object} UnavailableContentProps
+ * @property {Array<unknown>} errors
+ */
 
-/**
-* @param {SourceApiResource} resource
-* @returns {Source}
-*/
-static toEntityFromResource(resource) {
-let source = new Source({...resource});
-source.urlToLogo = source.url !== '' ? logoApi.getUrlToLogo(source) : '';
-return source;
-}
-}
+const { t } = useI18n();
+
+/** @type {UnavailableContentProps} */
+const props = defineProps({ errors: null});
+const { errors } = toRefs(props);
+</script>
+
+<template>
+  <div>
+    <div><h4>{{ t('unavailable-news') }}</h4></div>
+    <div v-for="error in errors">
+      <h6>{{ error }}</h6>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+
+</style>
